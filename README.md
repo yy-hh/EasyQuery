@@ -17,3 +17,4 @@
 ```bash
 git clone [你的仓库地址]
 cd EasyQuery
+pip install -r requirements.txt
