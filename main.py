@@ -8,12 +8,12 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
 
 # ======= 配置区 =======
-HOST = "rm-uf6jns304w8691777.mysql.rds.aliyuncs.com"
+HOST = "your host"
 PORT = 3306
-USER = "soundwise"
-PASS = "QVtTbco14n6H"
-DB = "soundwise"
-OUTDIR = r"E:\report\result"  # Windows 路径格式
+USER = "user"
+PASS = "pass"
+DB = "db"
+OUTDIR = r"E:\data"  # Windows 路径格式
 CONDITIONS_DB = 'query_conditions.db'  # 用于存储查询条件的SQLite数据库
 QUERY_LIMIT = 100  # 每次查询返回的最大记录数
 # ======================
