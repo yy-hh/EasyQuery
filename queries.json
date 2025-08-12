@@ -1,0 +1,7 @@
+[
+  {
+    "id": 1,
+    "name": "01_双侧正常",
+    "sql": "SELECT report_id, diag_data FROM report_struct_diag_data WHERE diag_data LIKE '%双侧颈动脉超声未见明显异常%' ORDER BY report_id DESC LIMIT 100"
+  }
+]

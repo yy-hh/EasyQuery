@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if query %}编辑查询条件{% else %}添加查询条件{% endif %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f8f9fa; padding: 20px; }
+        .form-container { background-color: white; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1); padding: 25px; max-width: 800px; margin: 0 auto; }
+        .condition-list { margin-bottom: 10px; }
+        .condition-input { margin-bottom: 5px; }
+        .form-section { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">
+                <i class="fas fa-edit me-2"></i>
+                {% if query %}编辑查询条件{% else %}添加查询条件{% endif %}
+            </h2>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>返回列表
+            </a>
+        </div>
+
+        <div class="form-container">
+            <form method="POST">
+                <div class="form-section">
+                    <h5><i class="fas fa-file-signature me-2"></i>基本信息</h5>
+                    <div class="mb-3">
+                        <label for="filename" class="form-label">文件名 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="filename" name="filename"
+                               value="{{ query.filename if query else '' }}" required>
+                        <div class="form-text">导出JSON文件的名称（不含扩展名）</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="table_name" class="form-label">表名 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="table_name" name="table_name"
+                                   value="{{ query.table_name if query else 'report_struct_diag_data' }}" required>
+                            <div class="form-text">要查询的数据表名称</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="field_name" class="form-label">字段名 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="field_name" name="field_name"
+                                   value="{{ query.field_name if query else 'diag_data' }}" required>
+                            <div class="form-text">要查询的字段名称</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h5><i class="fas fa-filter me-2"></i>查询条件</h5>
+                    <div class="mb-4">
+                        <label class="form-label">必须包含</label>
+                        <div id="must-include-list" class="condition-list">
+                            {% if query and query.must_include %}
+                                {% for item in query.must_include %}
+                                    <div class="input-group condition-input">
+                                        <input type="text" class="form-control" name="must_include[]"
+                                               value="{{ item }}" placeholder="输入必须包含的关键词或短语">
+                                        <button type="button" class="btn btn-outline-danger remove-condition">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="input-group condition-input">
+                                <input type="text" class="form-control" name="must_include[]"
+                                       placeholder="输入必须包含的关键词或短语">
+                                <button type="button" class="btn btn-outline-danger remove-condition">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary add-condition" data-target="must-include-list">
+                            <i class="fas fa-plus me-1"></i>添加包含条件
+                        </button>
+                        <div class="form-text">在字段内容中必须包含的关键词或短语</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">必须排除</label>
+                        <div id="must-exclude-list" class="condition-list">
+                            {% if query and query.must_exclude %}
+                                {% for item in query.must_exclude %}
+                                    <div class="input-group condition-input">
+                                        <input type="text" class="form-control" name="must_exclude[]"
+                                               value="{{ item }}" placeholder="输入必须排除的关键词或短语">
+                                        <button type="button" class="btn btn-outline-danger remove-condition">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="input-group condition-input">
+                                <input type="text" class="form-control" name="must_exclude[]"
+                                       placeholder="输入必须排除的关键词或短语">
+                                <button type="button" class="btn btn-outline-danger remove-condition">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary add-condition" data-target="must-exclude-list">
+                            <i class="fas fa-plus me-1"></i>添加排除条件
+                        </button>
+                        <div class="form-text">在字段内容中必须不包含的关键词或短语</div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-save me-2"></i>保存
+                    </button>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 添加条件输入框
+        document.querySelectorAll('.add-condition').forEach(button => {
+            button.addEventListener('click', function() {
+                const target = document.getElementById(this.dataset.target);
+                const newInput = document.createElement('div');
+                newInput.className = 'input-group condition-input';
+
+                // 根据条件类型设置 placeholder 和 name
+                let placeholder, name;
+                if (this.dataset.target === 'must-include-list') {
+                    placeholder = "输入必须包含的关键词或短语";
+                    name = "must_include[]";
+                } else if (this.dataset.target === 'must-exclude-list') {
+                    placeholder = "输入必须排除的关键词或短语";
+                    name = "must_exclude[]";
+                } else {
+                    placeholder = "输入条件";
+                    name = "condition[]";
+                }
+
+                newInput.innerHTML = `
+                    <input type="text" class="form-control" name="${name}" placeholder="${placeholder}">
+                    <button type="button" class="btn btn-outline-danger remove-condition">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                target.appendChild(newInput);
+
+                // 为新按钮添加事件监听
+                newInput.querySelector('.remove-condition').addEventListener('click', function() {
+                    this.closest('.condition-input').remove();
+                });
+            });
+        });
+
+        // 删除条件输入框
+        document.querySelectorAll('.remove-condition').forEach(button => {
+            button.addEventListener('click', function() {
+                this.closest('.condition-input').remove();
+            });
+        });
+
+        // 初始化页面时绑定所有删除按钮
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.remove-condition').forEach(button => {
+                button.addEventListener('click', function() {
+                    this.closest('.condition-input').remove();
+                });
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
